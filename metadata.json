@@ -1,0 +1,6 @@
+{
+  "name": "Plus Mineral 水晶平台",
+  "description": "一個清新簡約、富有質感與文青風的 Plus Mineral 水晶功效平台。支援依使用者不同需求、脈輪及色彩系統篩選適合的水晶種類，提供詳細能量特質、消磁淨化建議與互動式磬音淨化體驗。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
