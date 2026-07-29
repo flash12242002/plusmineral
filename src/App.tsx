@@ -13,6 +13,7 @@ import EnergyAssessor from './components/EnergyAssessor';
 import Logo from './components/Logo';
 import { useApp } from './context/AppContext';
 import AuthModal from './components/AuthModal';
+import MemberProfileModal from './components/MemberProfileModal';
 import { playCrystalChime } from './utils/audio';
 import { 
   Search, Sparkles, BookOpen, Heart, SlidersHorizontal, 
@@ -35,6 +36,8 @@ const LIFE_PATH_CRYSTAL_MAPPING: Record<number, string[]> = {
 export default function App() {
   const { user, logout, favorites, isFavorite } = useApp();
   const [searchTerm, setSearchTerm] = useState('');
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [selectedNeed, setSelectedNeed] = useState<string | null>(null);
   const [selectedChakra, setSelectedChakra] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
@@ -96,22 +99,77 @@ export default function App() {
             </div>
             
             {/* User Block in Banner for Tablet/Desktop */}
-            <div className="flex-shrink-0 flex items-center sm:absolute sm:right-0">
+            <div className="flex-shrink-0 flex items-center sm:absolute sm:right-0 relative">
               {user ? (
-                <div className="flex items-center gap-1.5 bg-stone-50 border border-[#ECE6DD] pl-2.5 pr-1.5 py-0.5 rounded-lg text-[10px]">
-                  <span className="text-slate-600 max-w-[100px] truncate">
-                    {user.isAnonymous ? '訪客' : user.email}
-                  </span>
+                <>
                   <button
-                    onClick={() => { playCrystalChime(); logout(); }}
-                    className="text-[9px] text-amber-900/65 hover:text-amber-900 px-1.5 py-0.5 rounded bg-white border border-[#ECE6DD] transition-all font-sans cursor-pointer"
+                    onClick={() => { playCrystalChime(); setDropdownOpen(!dropdownOpen); }}
+                    className="flex items-center gap-1.5 bg-stone-50 hover:bg-stone-100 border border-[#ECE6DD] px-2.5 py-1 rounded-lg text-[10px] text-slate-600 transition-all font-sans cursor-pointer outline-none"
                   >
-                    登出
+                    <span className="max-w-[110px] truncate font-medium">
+                      {user.isAnonymous ? '訪客' : user.email}
+                    </span>
+                    <ChevronDown size={11} className={`text-[#8E735B] transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
-                </div>
+                  
+                  {dropdownOpen && (
+                    <>
+                      {/* Transparent backdrop overlay to close dropdown when clicking outside */}
+                      <div 
+                        className="fixed inset-0 z-40 bg-transparent" 
+                        onClick={() => setDropdownOpen(false)} 
+                      />
+                      <div className="absolute right-0 top-full mt-1.5 w-48 bg-white border border-[#ECE6DD] rounded-xl shadow-lg py-1.5 z-50 text-[11px] font-serif text-slate-700 animate-in fade-in slide-in-from-top-2 duration-150">
+                        <div className="px-3.5 py-1.5 border-b border-[#FAF6EE] text-slate-400 font-mono text-[9px] tracking-wider uppercase">
+                          會員目錄 Menu
+                        </div>
+                        
+                        <button
+                          onClick={() => {
+                            playCrystalChime();
+                            setDropdownOpen(false);
+                            setActiveTab('favorites');
+                          }}
+                          className={`w-full text-left px-3.5 py-2.5 hover:bg-stone-50 flex items-center gap-2 transition-colors cursor-pointer ${
+                            activeTab === 'favorites' ? 'bg-[#FAF6EE] text-[#8E735B] font-medium' : 'text-[#6E645A]'
+                          }`}
+                        >
+                          <Heart size={12} className="text-[#8E735B]" />
+                          <span>我的收藏 · Favorites</span>
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            playCrystalChime();
+                            setDropdownOpen(false);
+                            setProfileModalOpen(true);
+                          }}
+                          className="w-full text-left px-3.5 py-2.5 hover:bg-stone-50 text-[#6E645A] flex items-center gap-2 transition-colors cursor-pointer"
+                        >
+                          <Info size={12} className="text-[#8E735B]" />
+                          <span>會員資料 · Profile</span>
+                        </button>
+
+                        <div className="border-t border-[#FAF6EE] my-1" />
+
+                        <button
+                          onClick={() => {
+                            playCrystalChime();
+                            setDropdownOpen(false);
+                            logout();
+                          }}
+                          className="w-full text-left px-3.5 py-2.5 hover:bg-rose-50 text-rose-700 flex items-center gap-2 transition-colors cursor-pointer"
+                        >
+                          <span className="w-3 h-3 rounded-full bg-rose-100 flex items-center justify-center text-[8px] text-rose-600 font-sans font-bold">✕</span>
+                          <span>登出帳號 · Logout</span>
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </>
               ) : (
                 <button
-                  onClick={() => { playCrystalChime(); setAuthMessage('登入以收藏您喜愛的水晶，隨時查看能量印記'); setAuthModalOpen(true); }}
+                  onClick={() => { playCrystalChime(); setAuthMessage('登入查看您已收藏的水晶，可隨時查看能量印記'); setAuthModalOpen(true); }}
                   className="px-2.5 py-1 bg-[#8E735B] hover:bg-[#7D644E] text-white text-[9px] font-serif rounded-lg shadow-2xs tracking-widest transition-colors cursor-pointer"
                 >
                   登入 / 註冊
@@ -182,17 +240,6 @@ export default function App() {
                 }`}
               >
                 保養須知 · Knowledge
-              </button>
-              <button
-                id="tab-favorites-btn"
-                onClick={() => { setActiveTab('favorites'); playCrystalChime(); }}
-                className={`px-3.5 py-2 rounded-lg text-xs font-serif transition-all duration-300 flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
-                  activeTab === 'favorites'
-                    ? 'bg-[#8E735B] text-white shadow-sm'
-                    : 'text-[#6E645A] hover:bg-stone-50'
-                }`}
-              >
-                我的收藏 · Favorites
               </button>
             </div>
           </div>
@@ -614,6 +661,17 @@ export default function App() {
         onClose={() => setAuthModalOpen(false)} 
         message={authMessage}
       />
+
+      {/* Member Profile Modal overlay */}
+      {profileModalOpen && (
+        <MemberProfileModal
+          isOpen={profileModalOpen}
+          onClose={() => setProfileModalOpen(false)}
+          user={user}
+          favorites={favorites}
+          crystals={CRYSTALS}
+        />
+      )}
 
       {/* 7. Design Signature Footer */}
       <footer className="bg-white border-t border-[#EBE7E1] py-10 px-6 text-center select-none">
