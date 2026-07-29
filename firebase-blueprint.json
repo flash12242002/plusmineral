@@ -1,0 +1,27 @@
+{
+  "entities": {
+    "Favorite": {
+      "title": "Favorite",
+      "description": "User favorite crystal representation",
+      "type": "object",
+      "properties": {
+        "crystalId": {
+          "type": "string",
+          "description": "The ID of the favorited crystal"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO timestamp when the crystal was favorited"
+        }
+      },
+      "required": ["crystalId", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/favorites/{crystalId}": {
+      "schema": "Favorite",
+      "description": "User's favorite crystals"
+    }
+  }
+}

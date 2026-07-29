@@ -1,0 +1,6 @@
+{
+  "name": "Plus Mineral 水晶平台",
+  "description": "一個清新簡約、富有質感與文青風的 Plus Mineral 水晶功效平台",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
